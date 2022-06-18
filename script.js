@@ -19,7 +19,7 @@ const addCard = () => {
   saveToLocalStorage();
 };
 
-//Change the image to the url of the image
+// TODO Change the image to selection tab later
 
 const generateTaskCard = ({ id, url, title, type, description }) => {
   return `
@@ -28,7 +28,7 @@ const generateTaskCard = ({ id, url, title, type, description }) => {
               <div class="card-header">
                 <div class="d-flex justify-content-end">
                   <button type="button" class="btn btn-outline-warning me-1" name=${id} onClick="editTask(this)">
-                    <i class="fas fa-edit" name=${id} onClick="editTask(this)"></i>
+                    <i class="fas fa-edit"></i>
                   </button>
                   <button type="button" class="btn btn-outline-danger" name=${id} onClick="deleteTask(this)">
                     <i class="fas fa-trash" name=${id} onClick="deleteTask(this)"></i>
@@ -42,7 +42,7 @@ const generateTaskCard = ({ id, url, title, type, description }) => {
                 <span class="badge bg-info">${type}</span>
               </div>
               <div class="card-footer">
-                <button class="btn btn-outline-success float-end">
+                <button class="btn btn-outline-success float-end" name=${id} data-bs-toggle="modal" data-bs-target="#viewCardModal" onClick=openTask(this)>
                   Open Task
                 </button>
               </div>
@@ -74,8 +74,31 @@ const deleteTask = (id) => {
 };
 
 const editTask = (id) => {
-  const target = id.getAttribute("name");
-  // globalTaskData = globalTaskData.filter((task) => task.id !== target);
+  id.parentNode.parentNode.parentNode.childNodes[5].childNodes[1].setAttribute("contenteditable", "true")
+  id.parentNode.parentNode.parentNode.childNodes[5].childNodes[3].setAttribute("contenteditable", "true")
+  id.parentNode.parentNode.parentNode.childNodes[5].childNodes[5].setAttribute("contenteditable", "true")
+  id.parentNode.parentNode.parentNode.childNodes[7].childNodes[1].innerHTML = "SAVE CHANGES"
+  id.parentNode.parentNode.parentNode.childNodes[7].childNodes[1].setAttribute("onclick", "saveTask(this)")
+};
+
+const saveTask = (e) => {
+  const targetID = e.getAttribute("name");
+  globalTaskData.forEach(tasks => {
+      if (tasks["id"] == targetID) {
+          tasks["title"] = e.parentNode.parentNode.childNodes[5].childNodes[1].outerText;
+          tasks["type"] = e.parentNode.parentNode.childNodes[5].childNodes[5].outerText;
+          tasks["description"] = e.parentNode.parentNode.childNodes[5].childNodes[3].outerText;
+      }
+    });
+  e.parentNode.parentNode.childNodes[7].childNodes[1].setAttribute("onClick", "openTask(this)");
+  e.parentNode.parentNode.childNodes[7].childNodes[1].innerHTML = "Open Task"
   saveToLocalStorage();
   window.location.reload();
-};
+}
+
+const openTask = (e) =>{
+  const targetID = document.getElementById("viewBody");
+  targetID.innerHTML = "<b>Title: " + e.parentNode.parentNode.childNodes[5].childNodes[1].outerText +"</b><br>"+ 
+                                    "<b><i>Type: </b>" + e.parentNode.parentNode.childNodes[5].childNodes[5].outerText +"</i> <br>"+
+                                    "<b>Description: </b>" + e.parentNode.parentNode.childNodes[5].childNodes[3].outerText;
+}
